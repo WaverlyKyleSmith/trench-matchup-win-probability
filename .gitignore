@@ -1,0 +1,23 @@
+# Raw competition data (Rules 7.B: not redistributed)
+nfl-big-data-bowl-2023/
+nfl-big-data-bowl-2023.zip
+
+# Row-level data derived from the competition data
+processed/*.parquet
+dashboard/data/play_animator_data.json
+
+# Python / Jupyter
+.ipynb_checkpoints/
+__pycache__/
+
+# Quarto / LaTeX build files
+.quarto/
+writeup/*_files/
+writeup/*.log
+writeup/*.aux
+writeup/*.tex
+writeup/*.toc
+
+# OS / editor
+.DS_Store
+.vscode/
