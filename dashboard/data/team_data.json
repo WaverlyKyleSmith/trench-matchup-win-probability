@@ -1,0 +1,322 @@
+[
+  {
+    "team": "ARI",
+    "blockers": 6.0,
+    "totalSnaps": 988.0,
+    "totalWins": 894.0,
+    "expectedWinRate": 0.887872137762757,
+    "winRate": 0.9048582995951417,
+    "winRateOverExpected": 0.016986161832384772,
+    "division": "NFC West"
+  },
+  {
+    "team": "ATL",
+    "blockers": 5.0,
+    "totalSnaps": 1353.0,
+    "totalWins": 1220.0,
+    "expectedWinRate": 0.8992306750435699,
+    "winRate": 0.90169992609017,
+    "winRateOverExpected": 0.0024692510466001183,
+    "division": "NFC South"
+  },
+  {
+    "team": "BAL",
+    "blockers": 5.0,
+    "totalSnaps": 1016.0,
+    "totalWins": 920.0,
+    "expectedWinRate": 0.8997119061472848,
+    "winRate": 0.905511811023622,
+    "winRateOverExpected": 0.005799904876337192,
+    "division": "AFC North"
+  },
+  {
+    "team": "BUF",
+    "blockers": 6.0,
+    "totalSnaps": 1094.0,
+    "totalWins": 972.0,
+    "expectedWinRate": 0.8809380829334259,
+    "winRate": 0.8884826325411335,
+    "winRateOverExpected": 0.0075445496077075624,
+    "division": "AFC East"
+  },
+  {
+    "team": "CAR",
+    "blockers": 6.0,
+    "totalSnaps": 1209.0,
+    "totalWins": 1070.0,
+    "expectedWinRate": 0.8888556830048857,
+    "winRate": 0.8850289495450786,
+    "winRateOverExpected": -0.003826733459807108,
+    "division": "NFC South"
+  },
+  {
+    "team": "CHI",
+    "blockers": 5.0,
+    "totalSnaps": 955.0,
+    "totalWins": 872.0,
+    "expectedWinRate": 0.905837383757087,
+    "winRate": 0.9130890052356021,
+    "winRateOverExpected": 0.007251621478515102,
+    "division": "NFC North"
+  },
+  {
+    "team": "CIN",
+    "blockers": 5.0,
+    "totalSnaps": 1133.0,
+    "totalWins": 1009.0,
+    "expectedWinRate": 0.9059101896062953,
+    "winRate": 0.8905560458958517,
+    "winRateOverExpected": -0.015354143710443635,
+    "division": "AFC North"
+  },
+  {
+    "team": "CLE",
+    "blockers": 6.0,
+    "totalSnaps": 1030.0,
+    "totalWins": 922.0,
+    "expectedWinRate": 0.8982694035016218,
+    "winRate": 0.8951456310679612,
+    "winRateOverExpected": -0.0031237724336605766,
+    "division": "AFC North"
+  },
+  {
+    "team": "DAL",
+    "blockers": 5.0,
+    "totalSnaps": 1080.0,
+    "totalWins": 992.0,
+    "expectedWinRate": 0.9095684792156573,
+    "winRate": 0.9185185185185185,
+    "winRateOverExpected": 0.008950039302861201,
+    "division": "NFC East"
+  },
+  {
+    "team": "DEN",
+    "blockers": 6.0,
+    "totalSnaps": 1323.0,
+    "totalWins": 1195.0,
+    "expectedWinRate": 0.9053506657019404,
+    "winRate": 0.9032501889644747,
+    "winRateOverExpected": -0.0021004767374657174,
+    "division": "AFC West"
+  },
+  {
+    "team": "DET",
+    "blockers": 6.0,
+    "totalSnaps": 1536.0,
+    "totalWins": 1341.0,
+    "expectedWinRate": 0.8902742006272698,
+    "winRate": 0.873046875,
+    "winRateOverExpected": -0.017227325627269807,
+    "division": "NFC North"
+  },
+  {
+    "team": "GB",
+    "blockers": 7.0,
+    "totalSnaps": 1043.0,
+    "totalWins": 937.0,
+    "expectedWinRate": 0.8952975264560228,
+    "winRate": 0.8983700862895494,
+    "winRateOverExpected": 0.0030725598335266113,
+    "division": "NFC North"
+  },
+  {
+    "team": "HOU",
+    "blockers": 8.0,
+    "totalSnaps": 1162.0,
+    "totalWins": 1028.0,
+    "expectedWinRate": 0.8873701355646071,
+    "winRate": 0.8846815834767642,
+    "winRateOverExpected": -0.0026885520878429103,
+    "division": "AFC South"
+  },
+  {
+    "team": "IND",
+    "blockers": 8.0,
+    "totalSnaps": 1210.0,
+    "totalWins": 1059.0,
+    "expectedWinRate": 0.8806562779363521,
+    "winRate": 0.8752066115702479,
+    "winRateOverExpected": -0.005449666366104222,
+    "division": "AFC South"
+  },
+  {
+    "team": "JAX",
+    "blockers": 7.0,
+    "totalSnaps": 1189.0,
+    "totalWins": 1074.0,
+    "expectedWinRate": 0.8896449438356571,
+    "winRate": 0.9032800672834315,
+    "winRateOverExpected": 0.0136351234477744,
+    "division": "AFC South"
+  },
+  {
+    "team": "KC",
+    "blockers": 6.0,
+    "totalSnaps": 1477.0,
+    "totalWins": 1347.0,
+    "expectedWinRate": 0.8948349498701644,
+    "winRate": 0.9119837508463101,
+    "winRateOverExpected": 0.017148800976145684,
+    "division": "AFC West"
+  },
+  {
+    "team": "LA",
+    "blockers": 5.0,
+    "totalSnaps": 1143.0,
+    "totalWins": 1036.0,
+    "expectedWinRate": 0.9007302943489995,
+    "winRate": 0.9063867016622922,
+    "winRateOverExpected": 0.005656407313292644,
+    "division": "NFC West"
+  },
+  {
+    "team": "LAC",
+    "blockers": 6.0,
+    "totalSnaps": 1268.0,
+    "totalWins": 1147.0,
+    "expectedWinRate": 0.9019556241550656,
+    "winRate": 0.9045741324921136,
+    "winRateOverExpected": 0.00261850833704802,
+    "division": "AFC West"
+  },
+  {
+    "team": "LV",
+    "blockers": 6.0,
+    "totalSnaps": 1245.0,
+    "totalWins": 1090.0,
+    "expectedWinRate": 0.8889569765113923,
+    "winRate": 0.8755020080321285,
+    "winRateOverExpected": -0.013454968479263751,
+    "division": "AFC West"
+  },
+  {
+    "team": "MIA",
+    "blockers": 6.0,
+    "totalSnaps": 1283.0,
+    "totalWins": 1093.0,
+    "expectedWinRate": 0.8891917637615397,
+    "winRate": 0.8519095869056897,
+    "winRateOverExpected": -0.03728217685585,
+    "division": "AFC East"
+  },
+  {
+    "team": "MIN",
+    "blockers": 6.0,
+    "totalSnaps": 1210.0,
+    "totalWins": 1070.0,
+    "expectedWinRate": 0.8983439136635173,
+    "winRate": 0.8842975206611571,
+    "winRateOverExpected": -0.014046393002360213,
+    "division": "NFC North"
+  },
+  {
+    "team": "NE",
+    "blockers": 6.0,
+    "totalSnaps": 1236.0,
+    "totalWins": 1113.0,
+    "expectedWinRate": 0.899100463367203,
+    "winRate": 0.9004854368932039,
+    "winRateOverExpected": 0.0013849735260009766,
+    "division": "AFC East"
+  },
+  {
+    "team": "NO",
+    "blockers": 6.0,
+    "totalSnaps": 831.0,
+    "totalWins": 746.0,
+    "expectedWinRate": 0.8923653189169084,
+    "winRate": 0.8977135980746089,
+    "winRateOverExpected": 0.005348279157700531,
+    "division": "NFC South"
+  },
+  {
+    "team": "NYG",
+    "blockers": 7.0,
+    "totalSnaps": 1264.0,
+    "totalWins": 1128.0,
+    "expectedWinRate": 0.8897731817221339,
+    "winRate": 0.8924050632911392,
+    "winRateOverExpected": 0.00263188156900529,
+    "division": "NFC East"
+  },
+  {
+    "team": "NYJ",
+    "blockers": 5.0,
+    "totalSnaps": 1229.0,
+    "totalWins": 1099.0,
+    "expectedWinRate": 0.8900649756605398,
+    "winRate": 0.8942229454841334,
+    "winRateOverExpected": 0.004157969823593621,
+    "division": "AFC East"
+  },
+  {
+    "team": "PHI",
+    "blockers": 6.0,
+    "totalSnaps": 922.0,
+    "totalWins": 827.0,
+    "expectedWinRate": 0.8839671333156801,
+    "winRate": 0.8969631236442517,
+    "winRateOverExpected": 0.012995990328571572,
+    "division": "NFC East"
+  },
+  {
+    "team": "PIT",
+    "blockers": 5.0,
+    "totalSnaps": 1051.0,
+    "totalWins": 930.0,
+    "expectedWinRate": 0.9091641232016878,
+    "winRate": 0.884871550903901,
+    "winRateOverExpected": -0.024292572297786807,
+    "division": "AFC North"
+  },
+  {
+    "team": "SEA",
+    "blockers": 5.0,
+    "totalSnaps": 925.0,
+    "totalWins": 828.0,
+    "expectedWinRate": 0.8911353370305655,
+    "winRate": 0.8951351351351351,
+    "winRateOverExpected": 0.00399979810456963,
+    "division": "NFC West"
+  },
+  {
+    "team": "SF",
+    "blockers": 5.0,
+    "totalSnaps": 944.0,
+    "totalWins": 870.0,
+    "expectedWinRate": 0.9030197987617072,
+    "winRate": 0.9216101694915254,
+    "winRateOverExpected": 0.018590370729818173,
+    "division": "NFC West"
+  },
+  {
+    "team": "TB",
+    "blockers": 5.0,
+    "totalSnaps": 1456.0,
+    "totalWins": 1349.0,
+    "expectedWinRate": 0.906942968758253,
+    "winRate": 0.926510989010989,
+    "winRateOverExpected": 0.019568020252736074,
+    "division": "NFC South"
+  },
+  {
+    "team": "TEN",
+    "blockers": 5.0,
+    "totalSnaps": 1137.0,
+    "totalWins": 1014.0,
+    "expectedWinRate": 0.9115412251511056,
+    "winRate": 0.8918205804749341,
+    "winRateOverExpected": -0.019720644676171517,
+    "division": "AFC South"
+  },
+  {
+    "team": "WAS",
+    "blockers": 7.0,
+    "totalSnaps": 1257.0,
+    "totalWins": 1150.0,
+    "expectedWinRate": 0.8984687514692047,
+    "winRate": 0.9148766905330151,
+    "winRateOverExpected": 0.01640793906381044,
+    "division": "NFC East"
+  }
+]

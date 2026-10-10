@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Play Viewer - Trench Matchup Win Probability</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logos.js"></script>
+</head>
+<body>
+    <div class="shell">
+
+        <header class="site-header">
+            <h1 class="site-title">Trench Matchup <span> Win Probability</span></h1>
+            <nav class="site-nav">
+                <a href="index.html">Blockers</a>
+                <a href="team.html">Teams</a>
+                <a href="play-animator.html" class="active">Play Viewer</a>
+            </nav>
+        </header>
+
+        <p class="lede">
+            Frame-by-frame replays of selected pass-block matchups, with a live win probability computed from the model at every tracked frame.
+        </p>
+
+        <div class="play-select-bar">
+            <select id="play-select"></select>
+            <div class="outcome-badge" id="outcome-badge"></div>
+        </div>
+
+        <div class="animator-layout">
+            <canvas id="field-canvas" width="700" height="300"></canvas>
+            <canvas id="probability-canvas" width="700" height="120"></canvas>
+        </div>
+
+        <div class="playback-controls">
+            <button id="play-pause-btn" class="control-btn">Play</button>
+            <input type="range" id="scrub-bar" min="0" max="0" value="0">
+            <span id="frame-label" class="frame-label"> Frame 1 of 1</span>
+        </div>
+    </div>
+
+    <script>
+        let allPlays = [];
+        let currentPlay = null;
+        let currentFrameIndex = 0;
+        let isPlaying = false;
+        let animationTimer = null;
+        let viewport = null;
+
+        async function init() {
+            const response = await fetch("data/play_animator_data.json");
+            allPlays = await response.json();
+
+            const sortedPlays = populatePlaySelect();
+            loadPlay(sortedPlays[0]);
+        }
+
+        function populatePlaySelect() {
+            const select = document.getElementById("play-select");
+            const sortedPlays = [...allPlays].sort((a, b) => a.week - b.week);
+
+            select.innerHTML = sortedPlays.map((play) => {
+                const originalIndex = allPlays.indexOf(play);
+                const label = `${play.blockerName} vs ${play.rusherName} (Wk ${play.week})`;
+                return `<option value="${originalIndex}">${label}</option>`;
+            }).join("");
+
+            select.addEventListener("change", () => {
+                const index = parseInt(select.value, 10);
+                loadPlay(allPlays[index]);
+            });
+
+            return sortedPlays
+        }
+
+        function computeViewport(play){
+            const allX = [];
+            const allY = [];
+
+            play.frames.forEach(frame => {
+                frame.players.forEach(p => {
+                    allX.push(p.x);
+                    allY.push(p.y);
+                });
+            });
+
+            const PADDING = 3;
+            const minX = Math.min(...allX) - PADDING;
+            const maxX = Math.max(...allX) + PADDING;
+            const minY = Math.min(...allY) - PADDING;
+            const maxY = Math.max(...allY) + PADDING;
+
+            const mirror = play.playDirection === "left";
+
+            return { minX, maxX, minY, maxY, mirror };
+        }
+
+        function loadPlay(play) {
+            currentPlay = play;
+            currentFrameIndex = 0;
+            pausePlayback();
+            viewport = computeViewport(play);
+
+            const snapFrame = play.frames[1];
+            const center = snapFrame.players.find(p => p.officialPosition === "C");
+            const losX = center ? center.x : snapFrame.players
+                .filter(p => ["Pass Block", "Pass Route", "Pass"]. includes(p.pff_role))
+                .reduce ((sum, p, _, arr) => sum + p.x / arr.length, 0);
+            viewport.losX = losX;
+
+            const badge = document.getElementById("outcome-badge");
+            const isWin = currentPlay.actualOutcome === "win";
+            badge.textContent = isWin ? "BLOCK WON" : "BLOCK LOST";
+            badge.className = "outcome-badge " + (isWin ? "win" : "loss");
+            const scrubBar = document.getElementById("scrub-bar");
+            scrubBar.max = currentPlay.frames.length - 1;
+            scrubBar.value = 0;
+            updateFrameLabel();
+
+            drawField();
+            drawFrame(0);
+        }
+
+        function updateFrameLabel() {
+            const label = document.getElementById("frame-label");
+            label.textContent = `Frame ${currentFrameIndex + 1} of ${currentPlay.frames.length}`;
+        }
+
+        document.getElementById("play-pause-btn").addEventListener("click", () => {
+            const btn = document.getElementById("play-pause-btn");
+            if (isPlaying) {
+                pausePlayback();
+                btn.textContent = "Play";
+            } else {
+                if (currentFrameIndex >= currentPlay.frames.length - 1) {
+                    currentFrameIndex = 0;
+                    drawFrame(0);
+                    document.getElementById("scrub-bar").value = 0;
+                    updateFrameLabel();
+                }
+                startPlayback();
+                btn.textContent = "Pause";
+            }
+        });
+
+        document.getElementById("scrub-bar").addEventListener("input", () => {
+            pausePlayback();
+            document.getElementById("play-pause-btn").textContent = "Play";
+            currentFrameIndex = parseInt(document.getElementById("scrub-bar").value, 10);
+            drawFrame(currentFrameIndex);
+            updateFrameLabel();
+        });
+
+        function drawField() {
+            const canvas = document.getElementById("field-canvas");
+            const ctx = canvas.getContext("2d");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ecefe9";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (viewport && viewport.losX !== undefined) {
+                const { minY, maxY, mirror } = viewport;
+                const midY = (minY + maxY) / 2;
+                const { y: losCanvasY } = toCanvasCoords(viewport.losX, midY, canvas);
+
+                ctx.strokeStyle = "#000000";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, losCanvasY);
+                ctx.lineTo(canvas.width, losCanvasY);
+                ctx.stroke();
+            }
+        }
+
+        function toCanvasCoords(realX, realY, canvas) {
+            const { minX, maxX, minY, maxY, mirror } = viewport;
+
+            const xRange = maxX - minX;
+            const yRange = maxY - minY;
+            let normX = (realX - minX) / xRange;
+            if (mirror) normX = 1 - normX;
+
+            const normY = (realY - minY) / yRange;
+            const canvasX = normY * canvas.width;
+            const canvasY = normX * canvas.height;
+
+            return { x: canvasX, y: canvasY };
+        }
+
+        function drawFrame(frameIndex) {
+            const canvas = document.getElementById("field-canvas");
+            const ctx = canvas.getContext("2d");
+
+            drawField();
+
+            const frame = currentPlay.frames[frameIndex];
+            if (!frame) return;
+
+            frame.players.forEach(player => {
+                const isBlocker = player.nflId === currentPlay.nflId;
+                const isRusher = player.nflId === currentPlay.rusherNflId;
+                const isHighlighted = isBlocker || isRusher;
+                const isQB = player.pff_role === "Pass";
+                const isOffense = ["Pass Block", "Pass Route", "Pass"].includes(player.pff_role);
+
+                const { x: px, y: py } = toCanvasCoords(player.x, player.y, canvas);
+
+                let color;
+                if (isBlocker) {
+                    color = "#33513f";
+                } else if (isRusher) {
+                    color = "#8c3a3a";
+                } else if (isQB) {
+                    color = "#565C66";
+                } else if (isOffense) {
+                    color = "#a9c2b0";
+                } else {
+                    color = "#d9b3ab";
+                }
+
+                let radius = 5;
+                if (isHighlighted) radius = 8;
+                else if (isQB) radius = 8;
+
+                ctx.fillStyle = color;
+                ctx.beginPath();
+                ctx.arc(px, py, radius, 0, 2 * Math.PI);
+                ctx.fill();
+
+                if (isHighlighted) {
+                    const initials = player.displayName
+                        .split(" ")
+                        .map(part => part[0])
+                        .join("");
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 9px 'IBM Plex Sans'";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText(initials, px, py);
+                } else if (isQB) {
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 7px 'IBM Plex Sans'";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillText("QB", px, py);
+                }
+            });
+
+            drawProbabilityChart(frameIndex);
+        }
+
+        function drawProbabilityChart(upToFrameIndex) {
+            const canvas = document.getElementById("probability-canvas");
+            const ctx = canvas.getContext("2d");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#ecefe9";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.strokeStyle = "#d2d6cc";
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height / 2);
+            ctx.lineTo(canvas.width, canvas.height / 2);
+            ctx.stroke();
+
+            const frames = currentPlay.frames;
+            const totalFrames = frames.length;
+            ctx.strokeStyle = "#33513f";
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            for (let i = 0; i <= upToFrameIndex; i++) {
+                const x = (i / (totalFrames - 1)) * canvas.width;
+                const y = canvas.height - (frames[i].winProbability * canvas.height);
+
+                if (i === 0) {
+                    ctx.moveTo(x, y);
+                } else {
+                    ctx.lineTo(x, y);
+                }
+            }
+            ctx.stroke();
+
+            const currentFrame = frames[upToFrameIndex];
+            const currentX = (upToFrameIndex / (totalFrames - 1)) * canvas.width;
+            const currentY = canvas.height - (currentFrame.winProbability * canvas.height);
+
+            ctx.fillStyle = "#b14a1e";
+            ctx.beginPath();
+            ctx.arc(currentX, currentY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+
+            ctx.fillStyle = "#1a1d24";
+            ctx.font = "13px 'IBM Plex Mono'";
+            const labelY = currentY < 20 ? currentY + 16 : currentY - 8;
+            const labelX = currentX > canvas.width - 80 ? currentX - 60 : currentX + 10;
+            ctx.fillText(`${(currentFrame.winProbability * 100).toFixed(1)}%`, labelX, labelY);
+        }
+
+        function startPlayback() {
+            if (isPlaying) return;
+            isPlaying = true;
+
+            animationTimer = setInterval(() => {
+                if (currentFrameIndex >= currentPlay.frames.length - 1) {
+                    pausePlayback();
+                    document.getElementById("play-pause-btn").textContent = "Play";
+                    return;
+                }
+                currentFrameIndex++;
+                drawFrame(currentFrameIndex);
+                document.getElementById("scrub-bar").value = currentFrameIndex;
+                updateFrameLabel();
+            }, 100);
+        }
+
+        function pausePlayback() {
+            isPlaying = false;
+            clearInterval(animationTimer);
+        }
+
+        function resetPlayback() {
+            pausePlayback();
+            currentFrameIndex = 0;
+            drawFrame(0);
+        }
+
+        init();
+    </script>
+
+</body>
+</html>

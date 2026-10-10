@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matchup Detail — Trench Matchup Win Probability</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logos.js"></script>
+</head>
+<body>
+
+<div class="shell">
+
+    <header class="site-header">
+        <h1 class="site-title">Trench Matchup <span>Win Probability</span></h1>
+        <nav class="site-nav">
+        <a href="index.html">Blockers</a>
+        <a href="team.html">Teams</a>
+        <a href="play-animator.html">Play Viewer</a>
+        </nav>
+    </header>
+
+<div class="matchup-header">
+  <h2 class="blocker-name" id="blocker-name-display">Loading blocker...</h2>
+  <div class="stat-strip">
+    <div class="stat-block">
+      <span class="stat-value" id="stat-winrate">—</span>
+      <span class="stat-label">Win Rate</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-value" id="stat-expected">—</span>
+      <span class="stat-label">Expected</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-value wroe-value" id="stat-wroe">—</span>
+      <span class="stat-label">WROE</span>
+    </div>
+    <div class="stat-block">
+      <span class="stat-value" id="stat-snaps">—</span>
+      <span class="stat-label">Snaps</span>
+    </div>
+  </div>
+</div>
+
+<h3 class="section-heading">Matchup History</h3>
+<div id="matchup-groups"></div>
+
+</div>
+
+<script>
+    async function init() {
+        const response = await fetch("data/matchup_data.json");
+        const allMatchups = await response.json();
+        const blockerResponse = await fetch("data/dashboard_data.json");
+        const allBlockers = await blockerResponse.json();
+        const params = new URLSearchParams(window.location.search);
+        const blockerName = params.get("blocker");
+        const nameDisplay = document.getElementById("blocker-name-display");
+    
+
+    if (!blockerName) {
+        nameDisplay.textContent = "No blocker specified.";
+    } else {
+        const blockerMatchups = allMatchups.filter(m => m.blocker === blockerName);
+
+        if (blockerMatchups.length === 0) {
+          nameDisplay.textContent = blockerName + " (no matchup data found)";
+        } else {
+            const blockerRecord = allBlockers.find(b => b.blockerName === blockerName);
+            const headshotUrl = blockerRecord && blockerRecord.headshotUrl ? blockerRecord.headshotUrl : null;
+
+            const headshotHtml = headshotUrl
+                ? `<img class="player-headshot" src="${headshotUrl}" alt="${blockerName} headshot">`
+                : "";
+            
+            nameDisplay.innerHTML = `${headshotHtml}${blockerName} <img class="team-logo-inline" src="${getLogoUrl(blockerMatchups[0].blockerTeam)}" alt="team logo">`;
+
+            const totalSnaps = blockerMatchups.reduce((sum, m) => sum + m.snaps, 0);
+            const totalWins = blockerMatchups.reduce((sum, m) => sum + m.wins, 0);
+            const avgExpected = blockerMatchups.reduce((sum, m) => sum + m.expectedWinRate, 0) / blockerMatchups.length;
+            const winRate = totalWins / totalSnaps;
+            const wroe = winRate - avgExpected;
+
+            document.getElementById("stat-winrate").textContent = (winRate * 100).toFixed(1) + "%";
+            document.getElementById("stat-expected").textContent = (avgExpected * 100).toFixed(1) + "%";
+            document.getElementById("stat-snaps").textContent = totalSnaps;
+
+            const wroeEl = document.getElementById("stat-wroe");
+            const wroeSign = wroe >= 0 ? "+" : "";
+            wroeEl.textContent = wroeSign + (wroe * 100).toFixed(1) + "%";
+            wroeEl.classList.add(wroe >= 0 ? "positive" : "negative");
+
+            const groupMap = {};
+            blockerMatchups.forEach(m => {
+                const key = `${m.week}-${m.team}`;
+                if (!groupMap[key]) {
+                    groupMap[key] = { week: m.team ? m.week : m.week, team: m.team, matchups: [] };
+                }
+                groupMap[key].matchups.push(m);
+                });
+
+                const groups = Object.values(groupMap).map(g => {
+                    const snaps = g.matchups.reduce((sum, m) => sum + m.snaps, 0);
+                    const wins = g.matchups.reduce((sum, m) => sum + m.wins, 0);
+                    const losses = g.matchups.reduce((sum, m) => sum + m.losses, 0);
+                    const winRate = wins / snaps;
+                    const expectedWinRate = g.matchups.reduce((sum, m) => sum + (m.expectedWinRate * m.snaps), 0) / snaps;
+                    const wroe = winRate - expectedWinRate;
+                    return { ...g, snaps, wins, losses, winRate, expectedWinRate, wroe };
+                });
+
+                groups.sort((a, b) => a.week - b.week);
+
+                const container = document.getElementById("matchup-groups");
+                container.innerHTML = groups.map((g, i) => {
+                    const pct = (g.winRate * 100).toFixed(1);
+                    const wroeSign = g.wroe >= 0 ? "+" : "";
+                    const wroeClass = g.wroe >= 0 ? "positive" : "negative";
+                    const groupId = `group-${i}`;
+
+                    const childRows = [...g.matchups].sort((a, b) => b.snaps - a.snaps).map(m => {
+                        const mPct = (m.winRate * 100).toFixed(1);
+                        const mWroeSign = m.winRateOverExpected >= 0 ? "+" : "";
+                        const mWroeClass = m.winRateOverExpected >= 0 ? "positive" : "negative";
+                        return `
+                            <tr>
+                                <td>${m.rusher}</td>
+                                <td class="num">${m.snaps}</td>
+                                <td class="num">${m.wins}</td>
+                                <td class="num">${m.losses}</td>
+                                <td class="num">${mPct}%</td>
+                                <td class="num wroe-value ${mWroeClass}">${mWroeSign}${m.winRateOverExpected !== undefined ? (m.winRateOverExpected * 100).toFixed(1) + "%" : "—"}</td>
+                            </tr>`;
+                    }).join("");
+
+                    return `
+                        <div class="matchup-group">
+                        <button class="matchup-group-header" data-target="${groupId}">
+                        <span class="matchup-group-arrow">▸</span>
+                        <img class="team-logo" src="${getLogoUrl(g.team)}" alt="${g.team} logo">
+                        <span class="matchup-group-title">Week ${g.week} vs ${g.team}</span>
+                        <span class="matchup-group-stats">
+                            <span>${g.snaps} snaps</span>
+                        <span>${g.wins}-${g.losses}</span>
+                        <span>${pct}%</span>
+                        <span class="wroe-value ${wroeClass}">${wroeSign}${(g.wroe * 100).toFixed(1)}%</span>
+                    </span>
+                </button>
+                <div class="matchup-group-body" id="${groupId}">
+                    <table class="stat-table">
+                        <thead>
+                            <tr>
+                            <th>Rusher</th>
+                            <th class="num">Snaps</th>
+                            <th class="num">Wins</th>
+                            <th class="num">Losses</th>
+                            <th class="num">Win Rate</th>
+                            <th class="num">WROE</th>
+                        </tr>
+                    </thead>
+                    <tbody>${childRows}</tbody>
+                </table>
+            </div>
+        </div>`;
+    }).join("");
+
+document.querySelectorAll(".matchup-group-header").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const body = document.getElementById(btn.dataset.target);
+    const arrow = btn.querySelector(".matchup-group-arrow");
+    const isOpen = body.classList.toggle("open");
+    arrow.textContent = isOpen ? "▾" : "▸";
+  });
+});
+        }
+    }
+    }
+
+    init();
+</script>
+
+</body>
+</html>

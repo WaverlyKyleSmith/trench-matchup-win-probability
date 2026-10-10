@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team View — Trench Matchup Win Probability</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logos.js"></script>
+</head>
+<body>
+
+<div class="shell">
+
+<header class="site-header">
+  <h1 class="site-title">Trench Matchup <span>Win Probability</span></h1>
+  <nav class="site-nav">
+    <a href="index.html">Blockers</a>
+    <a href="team.html" class="active">Teams</a>
+    <a href="play-animator.html">Play Viewer</a>
+  </nav>
+</header>
+
+<p class="lede">
+  Team-level pass-protection performance, aggregated from individual blocker matchups.
+</p>
+
+<div class="view-slider" id="view-slider" data-view="division">
+    <div class="view-slider-thumb"></div>
+    <button class="slider-option" data-view="division">Division View</button>
+    <button class="slider-option" data-view="league">League View</button>
+</div>
+
+<div id="division-groups"></div>
+
+<p class="footnote">
+    Team figures are the snap-weighted average of individual blocker win probabilities from an LSTM trained on 2021 player tracking data (NFL Big Data Bowl 2023).
+</p>
+
+<script>
+
+const divisionOrder = [
+  "AFC East", "AFC North", "AFC South", "AFC West",
+  "NFC East", "NFC North", "NFC South", "NFC West",
+];
+
+let allTeamData = [];
+
+async function loadTeamData() {
+  const response = await fetch("data/team_data.json");
+  allTeamData = await response.json();
+  render();
+}
+
+let currentView = "division";
+
+function render() {
+  const container = document.getElementById("division-groups");
+
+  if (currentView === "league") {
+    const allRanked = [...allTeamData].sort((a, b) => b.winRate - a.winRate);
+    container.innerHTML = buildTableHtml("Full League", allRanked);
+  } else {
+    container.innerHTML = divisionOrder.map(div => {
+      const teams = allTeamData
+        .filter(t => t.division === div)
+        .sort((a, b) => b.winRate - a.winRate);
+      return buildTableHtml(div, teams);
+    }).join("");
+  }
+}
+
+function buildTableHtml(heading, teams) {
+  const rows = teams.map(t => {
+    const pct = (t.winRate * 100).toFixed(1);
+    const expPct = (t.expectedWinRate * 100).toFixed(1);
+    const wroe = (t.winRateOverExpected * 100).toFixed(1);
+    const wroeSign = t.winRateOverExpected >= 0 ? "+" : "";
+    const wroeClass = t.winRateOverExpected >= 0 ? "positive" : "negative";
+    const barClass = pct >= 60 ? "" : "low";
+
+    return `
+      <tr>
+        <td class="team-cell">
+          <img class="team-logo" src="${getLogoUrl(t.team)}" alt="${t.team} logo">
+          <span>${t.team}</span>
+        </td>
+        <td class="num">${t.blockers}</td>
+        <td class="num">${t.totalSnaps}</td>
+        <td>
+          <span class="win-rate-cell">
+            <span class="win-bar"><span class="win-bar-fill ${barClass}" style="width:${pct}%"></span></span>
+            <span class="num">${pct}%</span>
+          </span>
+        </td>
+        <td class="num">${expPct}%</td>
+        <td class="num wroe-value ${wroeClass}">${wroeSign}${wroe}%</td>
+      </tr>`;
+  }).join("");
+
+  return `
+    <h3 class="section-heading">${heading}</h3>
+    <div class="table-wrap">
+      <table class="stat-table">
+        <thead>
+          <tr>
+            <th>Team</th>
+            <th class="num">Blockers</th>
+            <th class="num">Snaps</th>
+            <th class="num">Win Rate</th>
+            <th class="num">Exp. Win Rate</th>
+            <th class="num">WROE</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+document.getElementById("view-slider").addEventListener("click", (e) => {
+  const btn = e.target.closest(".slider-option");
+  if (!btn) return;
+  currentView = btn.dataset.view;
+  document.getElementById("view-slider").dataset.view = currentView;
+  render();
+});
+loadTeamData();
+
+</script>
+
+</div>
+
+</body>
+</html>

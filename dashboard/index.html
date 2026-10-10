@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trench Matchup Win Probability</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/logos.js"></script>
+</head>
+<body>
+
+    <div class="shell">
+
+        <header class="site-header">
+            <h1 class="site-title">Trench Matchup <span>Win Probability</span></h1>
+            <nav class="site-nav">
+                <a href="index.html" class="active">Blockers</a>
+                <a href="team.html">Teams</a>
+                <a href="play-animator.html">Play Viewer</a>
+            </nav>
+        </header>
+
+        <p class="lede">
+         Blocker-level pass-protection grades from the 2021 NFL season, built from player tracking data.
+        </p>
+
+        <div id="sample-notice" class="notice" style="display:none;">
+            Showing placeholder data. Connect dashboard_data.json to see real results.
+        </div>
+
+        <div class="filter-bar">
+            <select id="filter-position">
+                <option value="all">All Positions</option>
+             <option value="T">Tackle</option>
+                <option value="G">Guard</option>
+                <option value="C">Center</option>
+          </select>
+
+          <select id="filter-team">
+             <option value="all">All Teams</option>
+         </select>
+
+            <input type="search" id="filter-search" placeholder="Search Blocker">
+     </div>
+
+     <div class="table-wrap">
+            <table class="stat-table">
+                <thead>
+                    <tr>
+                        <th data-key="blockerName">Blocker</th>
+                        <th data-key="team">Team</th>
+                        <th data-key="snaps" class="num">Snaps</th>
+                        <th data-key="wins" class="num">Wins</th>
+                      <th data-key="losses" class="num">Losses</th>
+                      <th data-key="winRate" class="num">Win Rate</th>
+                      <th data-key="expectedWinRate" class="num">Exp. Win Rate</th>
+                      <th data-key="winRateOverExpected" class="num">WROE</th>
+                   </tr>
+               </thead>
+               <tbody id="table-body">
+               </tbody>
+         </table>
+        </div>
+
+        <div id="empty-state" class="empty-state" style="display:none;">
+          No blockers match these filters.
+        </div>
+
+        <p class="footnote">
+            Win probability estimated from an LSTM trained on 2021 player tracking data (NFL Big Data Bowl 2023).
+            Expected win rate reflects matchup difficulty; win rate over expected isolates blocker performance from it.
+        </p>
+    
+        <script>
+            let allData = [];
+            async function loadData() {
+                const response = await fetch("data/dashboard_data.json");
+                allData = await response.json();
+                populateTeamFilter();
+                applyFiltersAndSort();
+            }
+
+            function renderRows(rows){
+             const tbody = document.getElementById("table-body");
+             tbody.innerHTML = rows.map((r, i) => {
+                    const pct = (r.winRate*100).toFixed(1);
+                    const barClass = pct >= 60 ? "": "low";
+                    const expPct = (r.expectedWinRate*100).toFixed(1);
+                    const wroeClass = r.winRateOverExpected >= 0 ? "positive": "negative";
+                    const wroe = (r.winRateOverExpected * 100).toFixed(1);
+                    const wroeSign = r.winRateOverExpected > 0 ? "+" : "";
+                    const yardLineClass = (i + 1) % 10 === 0 ? " yard-line": "";
+
+                 return `
+                 <tr class="${yardLineClass}">
+                        <td class="name-cell">
+                            <a href="matchup.html?blocker=${encodeURIComponent(r.blockerName)}">${r.blockerName}</a>
+                            <span class="pos">${r.blockerPosition}</span>
+                        </td>
+                        <td class="team-cell"><img class="team-logo" src="${getLogoUrl(r.team)}" alt="${r.team} logo"><span>${r.team}</span></td>
+                        <td class="num">${r.snaps}</td>
+                        <td class="num">${r.wins}</td>
+                        <td class="num">${r.losses}</td>
+                        <td>
+                            <span class="win-rate-cell">
+                                <span class="win-bar"><span class="win-bar-fill ${barClass}" style="width:${pct}%"></span></span>
+                                <span class="num">${pct}%</span>
+                            </span>
+                        </td>
+                        <td class="num">${expPct}%</td>
+                        <td class="num wroe-value ${wroeClass}">${wroeSign}${wroe}%</td>
+                 </tr>`;
+                }).join("");
+            }
+
+            let sortKey = "winRate";
+            let sortDir = "desc";
+
+            function populateTeamFilter(){
+                const teams = [...new Set(allData.map(r => r.team))].sort();
+               const select = document.getElementById("filter-team");
+
+              teams.forEach(t => {
+                 const option = document.createElement("option");
+                 option.value = t;
+                 option.textContent = t;
+                 select.appendChild(option);
+             });
+            }
+
+            function applyFiltersAndSort(){
+             const posValue = document.getElementById("filter-position").value;
+             const teamValue = document.getElementById("filter-team").value;
+                const searchValue = document.getElementById("filter-search").value.toLowerCase();
+
+                let filtered = allData.filter(r => {
+                   if (posValue !== "all" && r.blockerPosition !== posValue) return false;
+                   if (teamValue !== "all" && r.team !== teamValue) return false;
+                   if (searchValue && !r.blockerName.toLowerCase().includes(searchValue)) return false;
+                   return true;
+                });
+
+                filtered.sort((a, b) => {
+                 const valA = a[sortKey];
+                 const valB = b[sortKey];
+                 const comparison = typeof valA === "string" ? valA.localeCompare(valB) : valA - valB;
+                 return sortDir === "asc" ? comparison : -comparison;
+                });
+
+                renderRows(filtered);
+            }
+
+            document.getElementById("filter-position").addEventListener("change", applyFiltersAndSort);
+            document.getElementById("filter-team").addEventListener("change", applyFiltersAndSort);
+            document.getElementById("filter-search").addEventListener("input", applyFiltersAndSort);
+
+            document.querySelectorAll("th[data-key]").forEach(th => {
+             th.addEventListener("click", () => {
+                    const key = th.dataset.key;
+                   if (sortKey === key) {
+                      sortDir = sortDir === "asc" ? "desc" : "asc";
+                 } else {
+                     sortKey = key;
+                     sortDir = "desc";
+                 }
+                 applyFiltersAndSort();
+                });
+            });
+
+            loadData();
+        </script>
+
+    </div>
+</body>
+</html>
