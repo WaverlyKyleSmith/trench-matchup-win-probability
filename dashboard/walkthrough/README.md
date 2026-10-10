@@ -1,6 +1,6 @@
 # Dashboard walkthrough
 
-A tour of the interactive dashboard. The pages are plain HTML and JavaScript; see [`dashboard/README.md`](../dashboard/README.md) to run them locally.
+A tour of the interactive dashboard. The pages are plain HTML and JavaScript; see [`dashboard/README.md`](../README.md) to run them locally.
 
 ## Blockers
 
