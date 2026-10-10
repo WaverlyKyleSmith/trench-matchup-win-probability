@@ -2,7 +2,7 @@
 
 Predicting NFL pass-block outcomes from player tracking data, and testing whether a model that reads the full trajectory of a rep beats one that only sees snapshots of it.
 
-**[Interactive dashboard](https://waverlykylesmith.github.io/trench-matchup-win-probability/)** · **[Technical writeup (PDF)](writeup/writeup.pdf)** · **[Slide deck (PDF)](slides/trench-matchup-deck.pdf)** · **[Limitations](limitations.md)**
+**[Dashboard walkthrough](dashboard/walkthrough/README.md)** · **[Technical writeup (PDF)](writeup/writeup.pdf)** · **[Slide deck (PDF)](slides/trench-matchup-deck.pdf)** · **[Limitations](limitations.md)**
 
 ## The question
 
@@ -37,7 +37,7 @@ LSTM AUC ranged from 0.806 to 0.821 across repeated training runs, so the gap ho
 3. Run `notebooks/01` through `07` in order. See [`notebooks/README.md`](notebooks/README.md).
 4. To view the dashboard locally, see [`dashboard/README.md`](dashboard/README.md).
 
-Running notebook 07 creates the Play Viewer's data file, which is why that page is empty on the hosted site.
+Running notebook 07 creates the Play Viewer's data file, which is why that page does not work from a plain clone.
 
 ## Repository layout
 
@@ -48,6 +48,7 @@ trench-matchup-win-probability/
 |-- models/       # saved XGBoost and LSTM weights
 |-- figures/      # charts used in the writeup
 |-- dashboard/    # the interactive dashboard
+|   `-- walkthrough/   # screenshot tour of the dashboard
 |-- slides/       # slide deck (PDF)
 |-- writeup/      # technical writeup (Quarto source and PDF)
 |-- limitations.md
