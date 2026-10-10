@@ -2,7 +2,7 @@
 
 Predicting NFL pass-block outcomes from player tracking data, and testing whether a model that reads the full trajectory of a rep beats one that only sees snapshots of it.
 
-**[Dashboard walkthrough](dashboard/walkthrough/README.md)** · **[Technical writeup (PDF)](writeup/writeup.pdf)** · **[Slide deck (PDF)](slides/Trench Matchup Win Probability.pdf)** · **[Limitations](limitations.md)**
+**[Dashboard walkthrough](dashboard/walkthrough/README.md)** · **[Technical writeup (PDF)](writeup/writeup.pdf)** · **[Slide deck (PDF)](slides/Trench%20Matchup%20Win%20Probability.pdf)** · **[Limitations](limitations.md)**
 
 ## The question
 
