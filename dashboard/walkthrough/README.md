@@ -6,7 +6,7 @@ A tour of the interactive dashboard. The pages are plain HTML and JavaScript; se
 
 Every qualifying blocker (80+ snaps), with win rate, expected win rate, and win rate over expected (WROE). Columns sort, and the table filters by position, team, or name.
 
-![Blockers page](01-blockers.png)
+![Blockers page](01-blocker.png)
 
 ## Filtering to a single team:
 
