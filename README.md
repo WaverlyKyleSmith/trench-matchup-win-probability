@@ -4,7 +4,7 @@ Predicting NFL pass-block outcomes from player tracking data, and testing whethe
 
 **[Dashboard walkthrough](dashboard/walkthrough/README.md)** · **[Technical writeup (PDF)](writeup/writeup.pdf)** · **[Slide deck (PDF)](slides/Trench%20Matchup%20Win%20Probability.pdf)** · **[Limitations](limitations.md)**
 
-## The question
+## The Question
 
 Does a model that watches every frame of a blocker-rusher matchup predict its outcome better than a model given summary statistics of the same matchup at a few sampled instants? If so, pass-block outcomes depend on how a rep unfolds, not just how it starts and ends.
 
