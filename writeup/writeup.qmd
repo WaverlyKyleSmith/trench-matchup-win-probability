@@ -372,13 +372,17 @@ The project repository is organized as follows:
 
 ```
 trench-matchup-win-probability/
-|-- nfl-big-data-bowl-2023/    # raw competition data (not included; see below)
-|-- notebooks/                  # 01-07, the full analysis pipeline
-|-- processed/                  # intermediate and final data artifacts
-|-- models/                     # saved model weights (XGBoost, LSTM)
-|-- figures/                    # exported charts referenced throughout this document
-|-- dashboard/                  # the interactive four-page dashboard
-`-- writeup/                    # this document
+|-- nfl-big-data-bowl-2023/   # raw data (not included)
+|-- notebooks/                # 01-07, the analysis pipeline
+|-- processed/                # intermediate data (not included)
+|-- models/                   # saved model weights
+|-- figures/                  # charts used in this document
+|-- dashboard/                # the interactive dashboard
+|   `-- walkthrough/          # screenshot tour
+|-- slides/                   # slide deck (PDF)
+|-- writeup/                  # this document
+|-- limitations.md
+`-- README.md
 ```
 
 Each notebook in `notebooks/` corresponds to one stage of the pipeline
