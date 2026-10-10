@@ -2,6 +2,8 @@
 
 The interactive dashboard: plain HTML, CSS, and JavaScript, with no build step.
 
+For a screenshot tour of each page, see [`walkthrough/`](walkthrough/README.md).
+
 | Page | Contents |
 |---|---|
 | `index.html` | Blocker table, filterable and sortable, with win rate, expected win rate, and WROE |
