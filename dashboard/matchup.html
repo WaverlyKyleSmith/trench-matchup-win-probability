@@ -77,7 +77,7 @@
 
             const totalSnaps = blockerMatchups.reduce((sum, m) => sum + m.snaps, 0);
             const totalWins = blockerMatchups.reduce((sum, m) => sum + m.wins, 0);
-            const avgExpected = blockerMatchups.reduce((sum, m) => sum + m.expectedWinRate, 0) / blockerMatchups.length;
+            const avgExpected = blockerMatchups.reduce((sum, m) => sum + m.expectedWinRate * m.snaps, 0) / totalSnaps;
             const winRate = totalWins / totalSnaps;
             const wroe = winRate - avgExpected;
 
