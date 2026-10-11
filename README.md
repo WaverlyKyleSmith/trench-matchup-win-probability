@@ -69,6 +69,10 @@ Team logos load from ESPN's image CDN, and player headshots load from URLs in th
 
 Portions of this project's pipeline, dashboard, and supporting materials were developed with the assistance of Claude (Anthropic). Methodological decisions and execution are my own.
 
+## License
+
+The code in this repository is released under the [MIT License](LICENSE). This does not cover the NFL Big Data Bowl 2023 competition data, which is subject to the competition's terms, or third-party images such as team logos and player headshots.
+
 ## Author 
 
 Kyle Smith · [GitHub](https://github.com/WaverlyKyleSmith)
